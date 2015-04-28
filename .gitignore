@@ -55,3 +55,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# AngularJS
+node_modules/
+bower_components/
