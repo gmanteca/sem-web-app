@@ -1,4 +1,8 @@
 <p>This is the partial for view 2.</p>
+<textarea ng-model="twitText"></textarea>
+<button ng-click="classify()"></button>
+<p>{{twitResult}}</p>
+
 <p>
   Showing of 'interpolate' filter:
   {{ 'Current version is v%VERSION%.' | interpolate }}
