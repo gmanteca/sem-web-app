@@ -25,9 +25,8 @@ angular.module('myApp.view1', ['ngRoute'])
         if (value['id'] == restaurant)
             selectedRestaurant = value;
     });
-
-    $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }',output:'json'}}).
-        success(function(data,status){
+    $.ajax({method:'GET',url:'http://156.35.95.63:8888/sparql?query=select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }&output=json'}).
+        done(function(data,status){
             var list = data['results']['bindings'];
             var items = [];
             selectedRestaurant['menuItems'] = items;
@@ -56,8 +55,8 @@ angular.module('myApp.view1', ['ngRoute'])
                         break;
                     case 'http://www.w3.org/2000/01/rdf-schema#container':
                         it['ingredients']=[]
-                        $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select ?v where { <'+value['v']['value']+'> ?x ?v .}',output:'json'}}).
-                            success(function(data,status){
+                        $.ajax({method:'GET',url:'http://156.35.95.63:8888/sparql?query=select ?v where { <'+value['v']['value']+'> ?x ?v .}&output=json'}).
+                            done(function(data){
                                 data['results']['bindings'].forEach(function(v){
                                     it['ingredients'].push(v['v']['value']);
                                 });
@@ -67,7 +66,7 @@ angular.module('myApp.view1', ['ngRoute'])
                 }
             });
         }).
-        error(function(data,status){
+        fail(function(data,status){
             alert('cannot recover data from menu');
         });
 
@@ -92,11 +91,12 @@ angular.module('myApp.view1', ['ngRoute'])
         $.ajax($scope.url).done(function(data){
             $scope.result = data;
         });
-
+    console.log("sending");
     //load data on sparql
-    $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select%20*%20where{%20<http://156.35.95.63/Restaurants>%20<http://schema.org/Restaurant>%20?r%20.%20?r%20?p%20?o%20.}',output:'json'}})
-        .success(function(data,status){
+    $.ajax({method:'GET',url:'http://156.35.95.63:8888/sparql?query=select%20*%20where{%20<http://156.35.95.63/Restaurants>%20<http://schema.org/Restaurant>%20?r%20.%20?r%20?p%20?o%20.}&output=json'})
+        .done(function(data){
             var list = data['results']['bindings'];
+            console.log("checkpoint");
             list.forEach(function(value,index,array){
 
                 if(!restaurantList.restaurants.some(function(element,index,array){element['id']==value['r']['value'];}))
@@ -138,10 +138,12 @@ angular.module('myApp.view1', ['ngRoute'])
 
                 }
             });
+            console.log(restaurantList);
         })
-        .error(function(data,status){
-            alert('Error, posible backend caído?');
+        .fail(function(data,status){
+            console.log('Error, posible backend caído?');
         })
     }
+//    console.log(restaurantList);
     $scope.url = 'http://156.35.98.21:3030';
 }]);

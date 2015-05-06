@@ -42,10 +42,18 @@ class MainHandler(RequestHandler):
 class ProxyHandler(RequestHandler):
     def get(self):
         #TODO get params and proxy it to SPARQL
-        pass
+        
+        self.setHeaders()
+        query = self.get_argument("query","")
+        output = self.get_argument("output","json")
+
+        response = requests.get('http://156.35.98.21:8080/restaurants/sparql?query='+query+'&output='+output)
+        self.write(response.content.decode())
+        
 
     def post(self):
         #TODO get params and proxy to SPARQL
+        self.setHeaders()
         pass
     def setHeaders(self):
         self.set_header("Access-Control-Allow-Origin","*")
@@ -71,21 +79,21 @@ class ClassificationHandler(RequestHandler):
         wc = self.WordCount(text)
         for word in wc:
             if word in status.terms:
-                if status.terms[word] > 0:
+                if float(status.terms[word]) > 0:
                     male += wc[word]
                 else:
                     female += wc[word]
         result={}
         value = 'Male' if male>female else 'Female'
-        
+        result['value']=value        
         result['trust']=male/female if female>male else female/male
         self.setHeaders()
-        self.write(json.loads(result.encode()))
+        self.write(json.dumps(result).encode())
         self.set_status(200)
         
     def cleanText(self,text):
         for sign in status.punctuation:
-            text = text.replace(word,"")
+            text = text.replace(sign,"")
         text = ' '.join([word for word in text.split() \
                          if word not in status.stopWords])
         text = text.replace('á','a')
