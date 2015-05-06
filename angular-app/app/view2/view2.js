@@ -11,7 +11,7 @@ angular.module('myApp.view2', ['ngRoute'])
 
 .controller('View2Ctrl', ['$scope','$http',function($scope,$http) {
     $scope.classify = function(){
-        $http.post('/classify',{text:$scope.twitText}).
+        $http.post('http://sb.gabrielmanteca.net:8888/classify',{text:$scope.twitText}).
             success(function(data,status){
                 $scope.twitResult=data;
         });

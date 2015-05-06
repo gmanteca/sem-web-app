@@ -17,7 +17,7 @@ angular.module('myApp.view1', ['ngRoute'])
             ['$scope','$routeParams','$location','$http',function($scope,$routeParams,$location,$http) {
     var restaurant = $routeParams.restId;
 
-    restaurantList = this;
+    var restaurantList = this;
     
     var selectedRestaurant = null;
 
@@ -26,7 +26,7 @@ angular.module('myApp.view1', ['ngRoute'])
             selectedRestaurant = value;
     });
 
-    $http({method:'GET',url:'/sparql',params:{query:'select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }',output:'json'}}).
+    $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }',output:'json'}}).
         success(function(data,status){
             var list = data['results']['bindings'];
             var items = [];
@@ -56,7 +56,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         break;
                     case 'http://www.w3.org/2000/01/rdf-schema#container':
                         it['ingredients']=[]
-                        $http({method:'GET',url:'/sparql',params:{query:'select ?v where { <'+value['v']['value']+'> ?x ?v .}',output:'json'}}).
+                        $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select ?v where { <'+value['v']['value']+'> ?x ?v .}',output:'json'}}).
                             success(function(data,status){
                                 data['results']['bindings'].forEach(function(v){
                                     it['ingredients'].push(v['v']['value']);
@@ -84,7 +84,7 @@ angular.module('myApp.view1', ['ngRoute'])
 }])
 */
 .controller('View1Ctrl', ['$scope','$http',function($scope,$http) {
-    restaurantList = this;
+    var restaurantList = this;
     restaurantList.restaurants = [];
     $scope.fetch = function(){
         console.log($scope.url);
@@ -94,7 +94,7 @@ angular.module('myApp.view1', ['ngRoute'])
         });
 
     //load data on sparql
-    $http({method:'GET',url:'/sparql',params:{query:'select%20*%20where{%20<http://156.35.95.63/Restaurants>%20<http://schema.org/Restaurant>%20?r%20.%20?r%20?p%20?o%20.}',output:'json'}})
+    $http({method:'GET',url:'http://sb.gabrielmanteca.net:8888/sparql',params:{query:'select%20*%20where{%20<http://156.35.95.63/Restaurants>%20<http://schema.org/Restaurant>%20?r%20.%20?r%20?p%20?o%20.}',output:'json'}})
         .success(function(data,status){
             var list = data['results']['bindings'];
             list.forEach(function(value,index,array){

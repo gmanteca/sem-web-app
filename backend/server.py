@@ -35,6 +35,7 @@ status = ClassificationStatus()
 #Handlers
 class MainHandler(RequestHandler):
     def get(self):
+        self.render('../angular-app/app/index.html')
         #TODO
         pass
 
@@ -47,11 +48,16 @@ class ProxyHandler(RequestHandler):
         #TODO get params and proxy to SPARQL
         pass
     def setHeaders(self):
-        self.getset_header("Access-Control-Allow-Origin","*")
-        self.getset_header("Content-Type", "application/json")
-
+        self.set_header("Access-Control-Allow-Origin","*")
+        self.set_header("Content-Type", "application/json")
+        self.set_header("Access-Control-Allow-Headers","*")
 #Twitter classification handler
 class ClassificationHandler(RequestHandler):
+    def options(self):
+        self.setHeaders()
+        self.set_status(200)
+    def get(self):
+        print("wtf?")
     def post(self):
         body=json.loads(self.request.body.decode())
         if 'text' not in body:
@@ -59,18 +65,20 @@ class ClassificationHandler(RequestHandler):
             self.set_status(400)
             self.finish()
             return
-        acum = 0
-        words = 0
+        male = 0
+        female = 0
         text = self.cleanText(body['text'])
         wc = self.WordCount(text)
         for word in wc:
             if word in status.terms:
-                acum += status.terms[word]*wc[word]
-                words += wc[word]
+                if status.terms[word] > 0:
+                    male += wc[word]
+                else:
+                    female += wc[word]
         result={}
-        value = 'Male' if acum/words>0 else 'Female'
-        result['value']=value
-        result['trust']=acum/words
+        value = 'Male' if male>female else 'Female'
+        
+        result['trust']=male/female if female>male else female/male
         self.setHeaders()
         self.write(json.loads(result.encode()))
         self.set_status(200)
@@ -80,6 +88,11 @@ class ClassificationHandler(RequestHandler):
             text = text.replace(word,"")
         text = ' '.join([word for word in text.split() \
                          if word not in status.stopWords])
+        text = text.replace('á','a')
+        text = text.replace('é','e')
+        text = text.replace('í','i')
+        text = text.replace('ó','o')
+        text = text.replace('ú','u')
         return text
         
     def WordCount(self, text):
@@ -92,8 +105,9 @@ class ClassificationHandler(RequestHandler):
         return result
 
     def setHeaders(self):
-        self.getset_header("Access-Control-Allow-Origin","*")
-        self.getset_header("Content-Type", "application/json")
+        self.set_header("Access-Control-Allow-Origin","*")
+        self.set_header("Content-Type", "application/json")
+        self.set_header("Access-Control-Allow-Headers","*")
 #Application Initialization
 
 app = Application([
@@ -104,7 +118,7 @@ app = Application([
     debug=True)
 
 if __name__ == "__main__":
-    app.listen(8080)
+    app.listen(8888)
 
     import argparse
     

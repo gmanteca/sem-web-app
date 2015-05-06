@@ -5,4 +5,12 @@
 <input type="text" ng-model="consulta" size="80"/>
 <button ng-click="fetch()">Obtener</button>
 
-<p>{{result}}</p>
+<div ng-repeat="rest in restaurantList.restaurants">
+    <div>
+        <span ng-model="rest.name"></span>
+    </div>
+    <div>
+        <span ng-model="rest.description"></span>
+    </div>
+</div>
+
