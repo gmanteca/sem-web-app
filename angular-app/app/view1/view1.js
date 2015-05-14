@@ -34,8 +34,6 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .service('Restaurants',function(){
     this.fetch=function(){
-        //return $.when(
-        //var result= $.when(
         
         var restaurants = [];
         $.ajax({async:false,method:'GET',url:'http://156.35.95.63:8888/sparql?query=select%20*%20where{%20<http://156.35.95.63/Restaurants>%20<http://schema.org/Restaurant>%20?r%20.%20?r%20?p%20?o%20.}&output=json'})
@@ -54,7 +52,23 @@ angular.module('myApp.view1', ['ngRoute'])
                         return false;})[0];
                 switch(value['p']['value']){
                     case 'http://schema.org/review':
-                        res['review'] = value['o']['value'];
+                        res['review'] = {};
+                        $.ajax({async:false,method:'GET',url:'http://156.35.95.63:8888/sparql?query=select * where { <'+value['o']['value']+'> ?x ?v .}&output=json'}).
+                            done(function(data){
+                                data['results']['bindings'].forEach(function(v){
+                                    switch(v['x']['value']){
+                                        case 'http://schema.org/reviewBody':
+                                            res['review']['body']=v['v']['value'];
+                                            break;
+                                        case 'http://schema.org/reviewRating':
+                                            res['review']['rating']=v['v']['value'];
+                                            break;
+                                        case 'http://schema.org/author':
+                                            res['review']['author']=v['v']['value'];
+                                            break;
+                                    }
+                                });
+                            });
                         break;
                     case 'http://schema.org/description':
                         res['description'] = value['o']['value'];
@@ -80,20 +94,18 @@ angular.module('myApp.view1', ['ngRoute'])
                     case 'http://schema.org/menu':
                         res['menu'] = value['o']['value'];
                         break;
-
+                    case 'http://schema.org/city':
+                        res['city'] = value['o']['value'];
+                        break;
+                    case 'http://schema.org/image':
+                        res['image'] = value['o']['value'];
+                        break;
                 }
             });
 
-            console.log(restaurants);
             return restaurants;
         });
         
-        //)
-        //.done(function(restaurants){
-        //return restaurants;
-        //});
-        console.log(restaurants);
-
         return restaurants;
     }
 
@@ -104,14 +116,13 @@ angular.module('myApp.view1', ['ngRoute'])
     var restaurant = $routeParams.restId;
 
     var restaurantList = this;
-    console.log(restaurants);    
     var selectedRestaurant = null;
 
     restaurants.forEach(function(value){
         if (value['id'] == restaurant)
             selectedRestaurant = value;
     });
-    $.ajax({method:'GET',url:'http://156.35.95.63:8888/sparql?query=select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }&output=json'}).
+    $.ajax({async:false,method:'GET',url:'http://156.35.95.63:8888/sparql?query=select ?p ?t ?v where { <'+selectedRestaurant['menu']+'> ?x ?p. ?p ?t ?v . }&output=json'}).
         done(function(data,status){
             var list = data['results']['bindings'];
             var items = [];
@@ -124,7 +135,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         return true;
                     else
                         return false;
-                });
+                })[0];
                 switch(value['t']['value']){
                     case 'http://schema.org/description':
                         it['description']=value['v']['value'];
@@ -143,7 +154,6 @@ angular.module('myApp.view1', ['ngRoute'])
                         $.ajax({async:false,method:'GET',url:'http://156.35.95.63:8888/sparql?query=select ?v where { <'+value['v']['value']+'> ?x ?v .}&output=json'}).
                             done(function(data){
                                 data['results']['bindings'].forEach(function(v){
-                                    console.log(v);
                                     it['ingredients'].push(v['v']['value']);
                                 });
                             });
@@ -161,19 +171,15 @@ angular.module('myApp.view1', ['ngRoute'])
     $scope.goBack = function(){
         $location.path('/');
     }
-    console.log(selectedRestaurant);
 })
 
 .controller('View1Ctrl', function(restaurants){
     var restaurantList=this;
-    console.log(restaurants);
     restaurantList.restaurants = restaurants;
 })
 
 
 .controller('RestaurantController', function(restaurants) {
     var restaurantList = this;
-    console.log(restaurants);
     restaurantList.restaurants = restaurants;
-//TODO THIS SHIT RECEIVES THE DATA FROM SPARQL
 });

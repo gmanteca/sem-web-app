@@ -1,8 +1,10 @@
-<span>RESTAURANTS</span>
-<div class="list-group" ng-repeat="rest in restaurantList.restaurants">
-    <div class="list-group-item">
-        <h4 class="list-group-item-heading"><a ng-href="#/restaurant/{{rest.id}}">{{rest.name}}</a></h4>
-        <p class="list-group-item-text">{{rest.description}}</p>
+<div class="list-group" itemscope itemtype="http://schema.org/Restaurant">
+    <div class="list-group-item row" ng-repeat="rest in restaurantList.restaurants">
+        <div class="col-md-3">
+            <img class="img-responsive img-thumbnail" itemprop="image" src="{{rest.image}}">
+        </div>
+        <h4 class="list-group-item-heading"><a ng-href="#/restaurant/{{rest.id}}"><span itemprop="name">{{rest.name}}</span></a></h4>
+        <p class="list-group-item-text" itemprop="description">{{rest.description}}</p>
 
     </div>
 </div>

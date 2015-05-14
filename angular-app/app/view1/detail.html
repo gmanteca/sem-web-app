@@ -1,11 +1,69 @@
-<span>RESTAURANTSDETAILS</span>
-<div class="list-group" ng-repeat="rest in restaurantList.restaurants">
-    <div class="list-group-item">
-        <h4 class="list-group-item-heading"><a ng-href="#/restaurant/{{rest.id}}">{{rest.name}}</a></h4>
-        <p class="list-group-item-text">{{rest.description}}</p>
-
+<div itemscope itemtype="http://schema.org/Restaurant">
+<div class="row panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><strong itemprop="name">{{restaurant.name}}</strong></h3>
+    </div>
+    <div class="col-md-3">
+        <img class="img-responsive img-thumbnail" itemprop="image" src="{{restaurant.image}}"></img>
+    </div>
+    <p class="list-group-item-text" itemprop="description">{{restaurant.description}}</p>
+        
+</div>
+<h3>Contacto</h3>
+<div class="row panel panel-default">
+    <div class="col-md-3 carousel">
+        <img class="img-responsive img-thumbnail" src="http://maps.googleapis.com/maps/api/staticmap?center={{restaurant.geo}}&size=200x200&zoom=15"></img>
+    </div>
+    <dl class="col-md-9 dl-horizontal">
+        <dt>Propietario</dt>
+        <dd itemprop="founder" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{restaurant.owner}}</span></dd>
+        <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+            <dt>Dirección</dt>
+            <dd itemprop="streetAddress">{{restaurant.address}}</dd>
+            <dt>Ciudad</dt>
+            <dd itemprop="addressLocality">{{restaurant.city}}</dd>
+        </div>
+        <dt>Teléfono</dt>
+        <dd itemprop="telephone">{{restaurant.telephone}}</dd>
+    </dl>
+</div>
+<h3>Reviews</h3>
+<div itemprop="review" itemscope itemtype="http://schema.org/Review" class="row list-group">
+    <div class="list-group-item" >
+        <dl class="dl-horizontal">
+            <dt>Autor</dt>
+            <dd itemprop="author">{{restaurant.review.author}}</dd>
+            <dt>Puntuación</dt>
+            <dd itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating"><span itemprop="ratingValue">{{restaurant.review.rating}}</span></dd>
+            <dt>Opinión</dt>
+            <dd itemprop="reviewBody">{{restaurant.review.body}}</dd>
+        </dl>
     </div>
 </div>
+<h3>Menú</h3>
+<div class="row panel-group" id="accordion">
+    <div class="panel panel-default" itemscope itemtype="http://schema.org/Offer" ng-repeat="mItem in restaurant.menuItems">
+        <div class="panel-heading" id="{{mItem.id}}">
+            <h4 class="panel-title">
+                <strong itemprop="name">{{mItem.name}}</strong>
+            </h4>
+        </div>
+        <div class="panel-collapse">
+            <div class="panel-body">
+                <h4>Descripción</h4>
+                <p itemprop="description">{{mItem.description}}</p>
+                <h4>Precio</h4>
+                <span itemprop="price">{{mItem.price}}</span> <span itemprop="priceCurrency">{{mItem.priceCurrency}}</span>
+                <h4>Ingredientes</h4>
+                <ul itemscope itemtype="http://schema.org/Recipe">
+                    <span hidden itemprop="name">{{mItem.name}}</span>
+                    <li itemprop="ingredients" ng-repeat="ing in mItem.ingredients">{{ing}}</li>
+                </ul>
+                <!-- content of the menuitem -->
+            </div>
+        </div>
+    </div>
 
-<p>{{restaurant}}</p>
+</div>
 
+</div>

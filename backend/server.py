@@ -84,9 +84,17 @@ class ClassificationHandler(RequestHandler):
                 else:
                     female += wc[word]
         result={}
-        value = 'Male' if male>female else 'Female'
-        result['value']=value        
-        result['trust']=male/female if female>male else female/male
+        if male>female:
+            result['value']="Male"
+            result['trust']=male/female
+        elif female>male:
+            result['value']="Female"
+            result['trust']=female/male
+        else:
+            result['value']="Unknown"
+            result['trust']="0.5"
+        result['femaleWords']=female
+        result['maleWords']=male
         self.setHeaders()
         self.write(json.dumps(result).encode())
         self.set_status(200)

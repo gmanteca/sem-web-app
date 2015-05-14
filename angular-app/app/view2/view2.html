@@ -1,9 +1,14 @@
-<p>This is the partial for view 2.</p>
-<textarea ng-model="twitText"></textarea>
-<button ng-click="classify()">Fetch!</button>
-<p>{{twitResult}}</p>
-
-<p>
-  Showing of 'interpolate' filter:
-  {{ 'Current version is v%VERSION%.' | interpolate }}
-</p>
+<h4>Texto a clasificar</h4>
+<textarea class="form-control" ng-model="twitText"></textarea>
+<br>
+<button class="row btn btn-primary pull-right" ng-click="classify()">Fetch!</button>
+<div class="row" ng-if="show">
+<dl class="dl-horizontal">
+    <dt>Resultado</dt>
+    <dd>{{gender}}</dd>
+    <dt>Confianza</dt>
+    <dd>{{trust}}</dd>
+</dl>
+<h4>Respuesta</h4>
+<code>{{twitResult}}</code>
+</div>
